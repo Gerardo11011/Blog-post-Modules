@@ -2,9 +2,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
-const model = model.router('./blog-post-router')
+const router = require('./blog-post-router')
 
-
+app.use('/',jsonParser,router);
 
 
 

@@ -31,3 +31,66 @@ Posts = [
       publishDate: '15-Feb-19'
     }
 ]
+
+const List = {
+  get : function() {
+    return Posts
+  },
+
+  getPostAuthor : function (author){
+    let listauthor = [];
+    Posts.forEach(item => {
+      if (item.author == author){
+        listauthor.push(item);
+      }
+    })
+    return listauthor;
+  },
+
+  addPost: function(title, content, author, publishDate) {
+       let newP = {
+           id: uuidv4(),
+           title: title,
+           content: content,
+           author: author,
+           publishDate: publishDate
+       }
+       Posts.push(newP)
+       return newP;
+     },
+
+  deletePost : function(IDdelete){
+    let post = null;
+    Posts.forEach(function(item,index) {
+      if (item.id == IDdelete){
+        post = item;
+        Posts.splice(index,1)
+      }
+    })
+    return post;
+  },
+
+  putPost: function(IDpost, NewPost){
+    let post = null;
+    Posts.forEach(function(item,index) {
+      if (Posts.id = IDpost){
+        post = Posts[index];
+        if (NewPost.title) {
+          post.title = NewPost.title;
+        }
+        if (NewPost.content) {
+          post.content = NewPost.content;
+        }
+        if (NewPost.author) {
+          post.author = NewPost.author;
+        }
+        if (NewPost.publishDate) {
+          post.publishDate = NewPost.publishDate;
+        }
+      }
+    })
+    return post;
+  }
+}
+
+module.exports = { List }

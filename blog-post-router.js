@@ -1,16 +1,30 @@
 const express = require('express');
+const router = express.Router();
+const {List} = require ('./blog-post-model');
+
 // GET method route
-app.get('/blog-post', (req, res) => {
+router.get('/blog-post', (req, res, next) => {
+  const post = List.get();
+
+  if (post){
     res.status(200).json({
         message: "Successfully sent the list of posts",
         status: 200,
-        posts: Posts
+        posts: post
     });
+  }
+  else {
+    res.status(500).json({
+        message: "Internal Serve Error",
+        status: 500
+    });
+     next();
+  }
 });
 
 
 // GET method route
-app.get('/blog-post/:author', (req, res) => {
+router.get('/blog-post/:author', (req, res, next) => {
     const Author = req.params.author;
 
     if(!Author){
@@ -18,14 +32,10 @@ app.get('/blog-post/:author', (req, res) => {
             message: "Author Missing",
             status: 406
         });
+         next();
     }
 
-    const authorPosts = [];
-    Posts.forEach(item => {
-        if(Author == item.author){
-            authorPosts.push(item);
-        }
-    });
+    const authorPosts = List.getPostAuthor(Author);
 
     if(authorPosts.length > 0){
         res.status(200).json({
@@ -33,39 +43,34 @@ app.get('/blog-post/:author', (req, res) => {
             status: 200,
             post: authorPosts
         });
-    }else{
+    }
+    else{
         res.status(404).json({
             message : "Author not found",
             status : 404
         });
+         next();
     }
+
 });
 
 // POST method route
-app.post('/blog-post', jsonParser, (req, res) => {
+router.post('/blog-post', (req, res, next) => {
 
     const title = req.body.title;
     const content = req.body.content;
     const Author = req.body.author;
     const date = req.body.publishDate;
-    const post = req.body.post;
 
-    if(!post || !post.title || !post.content || !post.author || !post.publishDate){
+    if(!title || !content || !Author || !date){
     res.status(406).json({
       message : "Missing data.",
       status : 406
     })
-    return;
+     next;
   }
 
-    let PostNew = {
-        id: uuid.v4(),
-        title: title,
-        content: content,
-        author: Author,
-        publishDate: date
-    };
-    Posts.push(PostNew);
+    let PostNew = List.addPost(title, content, Author, date)
 
     res.status(201).json({
         message: "Post Added",
@@ -76,36 +81,37 @@ app.post('/blog-post', jsonParser, (req, res) => {
 
 
 //DELETE method route
-app.delete('/blog-post/:id', jsonParser, (req, res) => {
-    const bodyId = req.body.id;
-    const paramId = req.params.id;
-    if(!bodyId || !paramId || bodyId != paramId){
+router.delete('/blog-post/:id', (req, res, next) => {
+    const bodyID = req.body.id;
+    const paramID = req.params.id;
+    const post = List.deletePost(bodyID);
+    if(!bodyID || !paramID || bodyID != paramID){
         res.status(406).json({
             message: "ID Missing",
             status: 406
         });
-        return;
+         next();
     }
 
-    Posts.forEach((item, index) => {
-        if(paramId == item.id){
-            delete Posts[index];
-            res.status(204).send("Delete");
-            return;
-        }
-    });
-
-    res.status(404).json({
-        message: "Post not found",
-        status: 404
-    });
-
-
+    if (post) {
+      res.status(204).json({
+          message: "Post delete",
+          status: 204
+      });
+       next();
+    }
+    else {
+      res.status(404).json({
+          message: "Post not found",
+          status: 404
+      });
+       next();
+    }
 });
 
 
 //PUT method route
-app.put('/blog-post/:id', jsonParser, (req, res) => {
+router.put('/blog-post/:id', (req, res, next) => {
     let postId = req.params.id;
     let NewPost = req.body;
 
@@ -115,46 +121,36 @@ app.put('/blog-post/:id', jsonParser, (req, res) => {
             message: "ID Missing",
             status: 406
         });
-        return;
+         next();
     }
 
-    let PostNew = null;
+
 
     if(!NewPost.title && !NewPost.content && !NewPost.author && !NewPost.publishDate){
         res.status(404).json({
             message: "No data in body",
             status: 404
         });
-        return;
-    }else{
-        Posts.forEach(item => {
-            if(postId == item.id){
-                if(NewPost.title) {
-                  item.title = NewPost.title;
-                }
-                if(NewPost.content) {
-                  item.content = NewPost.content;
-                }
-                if(NewPost.author) {
-                  item.author = NewPost.author;
-                }
-                if(NewPost.publishDate) {
-                  item.publishDate = NewPost.publishDate;
-                }
-                PostNew = item;
-
-                res.status(200).json({
-                    message: "Post Updated",
-                    status: 200,
-                    post: PostNew
-                });
-            }
-        });
+         next();
     }
 
-    res.status(404).json({
-        message: 'ID not found',
-        status: 404,
-    });
+    const PostNew = List.putPost(postId, NewPost);
 
+    if (Post){
+      res.status(204).json({
+          message: "Post delete",
+          status: 204
+      });
+       next();
+    }
+    else {
+      res.status(404).json({
+          message: 'ID not found',
+          status: 404,
+      });
+       next();
+    }
 });
+
+
+module.exports = router;
