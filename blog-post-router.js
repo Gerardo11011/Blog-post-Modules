@@ -8,7 +8,7 @@ router.get('/blog-post', (req, res, next) => {
 
   if (post){
     res.status(200).json({
-        message: "Successfully sent the list of posts",
+        message: "All Succes",
         status: 200,
         posts: post
     });
