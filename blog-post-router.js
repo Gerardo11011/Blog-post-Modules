@@ -67,7 +67,7 @@ router.post('/blog-post', (req, res, next) => {
       message : "Missing data.",
       status : 406
     })
-     next;
+     next();
   }
 
     let PostNew = List.addPost(title, content, Author, date)
