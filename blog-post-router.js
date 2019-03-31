@@ -115,7 +115,6 @@ router.put('/blog-post/:id', (req, res, next) => {
     let postId = req.params.id;
     let NewPost = req.body;
 
-
     if(!postId){
         res.status(406).json({
             message: "ID Missing",
@@ -123,8 +122,6 @@ router.put('/blog-post/:id', (req, res, next) => {
         });
          next();
     }
-
-
 
     if(!NewPost.title && !NewPost.content && !NewPost.author && !NewPost.publishDate){
         res.status(404).json({
@@ -138,7 +135,7 @@ router.put('/blog-post/:id', (req, res, next) => {
 
     if (Post){
       res.status(204).json({
-          message: "Post delete",
+          message: "Post Update",
           status: 204
       });
        next();
